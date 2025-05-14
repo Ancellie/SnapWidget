@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Array of drawable resources for widget backgrounds -->
+    <array name="widget_backgrounds">
+        <item>@drawable/image1</item>
+        <item>@drawable/image2</item>
+        <item>@drawable/image3</item>
+        <item>@drawable/image4</item>
+        <item>@drawable/image5</item>
+    </array>
+
+    <!-- Array of quotes for widget display -->
+    <array name="widget_quotes">
+        <item>Кожен новий день - це нова можливість!</item>
+        <item>Мрій, вір, досягай!</item>
+        <item>Найкращий час для нових починань - зараз!</item>
+        <item>Успіх приходить до тих, хто діє!</item>
+        <item>Твоя посмішка змінює світ навколо!</item>
+        <item>Будь кращою версією себе сьогодні!</item>
+        <item>Неможливе можливо, якщо ти віриш!</item>
+        <item>Наповни день яскравими моментами!</item>
+        <item>Маленькі кроки ведуть до великих перемог!</item>
+        <item>Живи мрією!</item>
+    </array>
+
+    <!-- Arrays for update frequency preference -->
+    <string-array name="update_frequency_entries">
+        <item>Щодня</item>
+        <item>Кожні 12 годин</item>
+        <item>Кожні 6 годин</item>
+        <item>Щогодини</item>
+    </string-array>
+
+    <string-array name="update_frequency_values">
+        <item>1440</item>  <!-- Minutes in a day -->
+        <item>720</item>   <!-- Minutes in 12 hours -->
+        <item>360</item>   <!-- Minutes in 6 hours -->
+        <item>60</item>    <!-- Minutes in 1 hour -->
+    </string-array>
+</resources>

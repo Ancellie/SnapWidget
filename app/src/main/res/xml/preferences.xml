@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Налаштування віджета">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="use_custom_generator"
+            android:summary="Створювати зображення з накладеним текстом"
+            android:title="Генератор зображень" />
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/update_frequency_entries"
+            android:entryValues="@array/update_frequency_values"
+            android:key="update_frequency"
+            android:summary="Виберіть як часто оновлювати віджет"
+            android:title="Частота оновлення" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="default_text"
+            android:summary="Залиште порожнім для випадкових текстів"
+            android:title="Власний текст" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Про додаток">
+        <Preference
+            android:key="about"
+            android:summary="Щоденний віджет з фотографіями v1.0"
+            android:title="Щоденний фото-віджет" />
+    </PreferenceCategory>
+</PreferenceScreen>

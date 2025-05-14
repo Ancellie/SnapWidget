@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Щоденний Фото Віджет</string>
+    <string name="widget_description">Віджет із щоденними зображеннями та цитатами</string>
+    <string name="widget_configure_title">Налаштування віджета</string>
+    <string name="widget_custom_text_hint">Введіть власний текст</string>
+    <string name="widget_update_frequency">Частота оновлення</string>
+    <string name="widget_daily">Щодня</string>
+    <string name="widget_12hours">Кожні 12 годин</string>
+    <string name="widget_hourly">Щогодини</string>
+    <string name="widget_confirm">Підтвердити</string>
+</resources>
