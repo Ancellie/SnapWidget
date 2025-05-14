@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Щоденний Фото Віджет</string>
-    <string name="widget_description">Віджет із щоденними зображеннями та цитатами</string>
-    <string name="widget_configure_title">Налаштування віджета</string>
-    <string name="widget_custom_text_hint">Введіть власний текст</string>
-    <string name="widget_update_frequency">Частота оновлення</string>
-    <string name="widget_daily">Щодня</string>
-    <string name="widget_12hours">Кожні 12 годин</string>
-    <string name="widget_hourly">Щогодини</string>
-    <string name="widget_confirm">Підтвердити</string>
+    <string name="app_name">Lab6Android</string>
+
+    <!-- MainActivity strings -->
+    <string name="texts">Тексти</string>
+    <string name="images">Зображення</string>
+    <string name="add_new_item">Додати новий елемент</string>
+    <string name="delete">Видалити</string>
+    <string name="edit">Редагувати</string>
+    <string name="update">Оновити</string>
+    <string name="cancel">Скасувати</string>
+    <string name="add">Додати</string>
+    <string name="enter_text">Введіть текст</string>
+    <string name="text_hint">Введіть свій текст тут</string>
+    <string name="enter_image_name">Введіть назву зображення</string>
+    <string name="image_name_hint">Назва зображення</string>
+    <string name="delete_confirmation">Підтвердження видалення</string>
+    <string name="delete_text_confirm">Ви впевнені, що хочете видалити цей текст?</string>
+    <string name="delete_image_confirm">Ви впевнені, що хочете видалити це зображення?</string>
+    <string name="text_deleted">Текст видалено</string>
+    <string name="image_deleted">Зображення видалено</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="image_preview">Попередній перегляд зображення</string>
+
+    <!-- WidgetConfigureActivity strings -->
+    <string name="configure_widget">Налаштування віджета</string>
+    <string name="custom_text_label">Власний текст (залиште порожнім для випадкового тексту)</string>
+    <string name="custom_text_hint">Введіть текст для відображення на віджеті</string>
+    <string name="update_frequency_label">Як часто оновлювати віджет?</string>
+    <string name="daily">Щодня</string>
+    <string name="every_12_hours">Кожні 12 годин</string>
+    <string name="hourly">Щогодини</string>
+    <string name="confirm">Підтвердити</string>
+
+    <!-- Widget strings -->
+    <string name="widget_description">Мотиваційний віджет</string>
+    <string name="widget_image_description">Зображення віджета</string>
 </resources>

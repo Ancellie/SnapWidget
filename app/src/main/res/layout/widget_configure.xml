@@ -8,29 +8,33 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Налаштування віджета"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Власний текст (опціонально):"
-        android:layout_marginBottom="4dp" />
-
-    <EditText
-        android:id="@+id/custom_text_edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Залиште порожнім для випадкових текстів"
+        android:text="@string/configure_widget"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Частота оновлення:"
-        android:layout_marginBottom="4dp" />
+        android:text="@string/custom_text_label"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/custom_text_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/custom_text_hint"
+        android:inputType="textMultiLine"
+        android:minLines="2"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/update_frequency_label"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
 
     <RadioGroup
         android:id="@+id/update_frequency_group"
@@ -42,20 +46,20 @@
             android:id="@+id/radio_daily"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Щодня"
+            android:text="@string/daily"
             android:checked="true" />
 
         <RadioButton
             android:id="@+id/radio_12hours"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Кожні 12 годин" />
+            android:text="@string/every_12_hours" />
 
         <RadioButton
             android:id="@+id/radio_hourly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Кожну годину" />
+            android:text="@string/hourly" />
 
     </RadioGroup>
 
@@ -63,6 +67,6 @@
         android:id="@+id/confirm_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Підтвердити" />
+        android:text="@string/confirm" />
 
 </LinearLayout>

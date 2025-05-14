@@ -1,4 +1,3 @@
-// Виправлений код для MyWidgetProvider.java
 package com.example.lab6android;
 
 import android.app.AlarmManager;
@@ -9,15 +8,27 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class MyWidgetProvider extends AppWidgetProvider {
     private static final String TAG = "MyWidgetProvider";
     public static final String ACTION_UPDATE_WIDGET = "com.example.lab6android.UPDATE_WIDGET";
+
+    // Константи для SharedPreferences, які мають збігатися з MainActivity
+    private static final String PREFS_NAME = "com.example.lab6android.WidgetContentPrefs";
+    private static final String PREF_ALL_TEXTS = "all_texts";
+    private static final String PREF_ENABLED_IMAGES = "enabled_images";
+    private static final String PREF_CUSTOM_IMAGES = "custom_images";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -47,35 +58,55 @@ public class MyWidgetProvider extends AppWidgetProvider {
                 String customText = WidgetConfigureActivity.loadCustomText(context, appWidgetId);
                 Log.d(TAG, "onUpdate: customText = " + customText);
 
-                // Отримуємо масиви текстів та зображень з ресурсів
-                String[] texts;
-                try {
-                    texts = context.getResources().getStringArray(R.array.widget_quotes);
-                } catch (Exception e) {
-                    Log.e(TAG, "Помилка при отриманні масиву текстів", e);
-                    texts = new String[]{"Гарного дня!", "Чудового настрою!"};
+                // Отримуємо масиви текстів з SharedPreferences
+                List<String> availableTexts = loadAvailableTexts(context);
+                if (availableTexts.isEmpty()) {
+                    Log.w(TAG, "Немає доступних текстів, використовуємо запасний варіант");
+                    availableTexts.add("Гарного дня!");
+                    availableTexts.add("Чудового настрою!");
                 }
 
                 // Генеруємо випадковий індекс для зображення та тексту
                 Random random = new Random();
-                int imageIndex = random.nextInt(5); // Використовуємо фіксовану кількість зображень
-                int textIndex = random.nextInt(texts.length);
+                int textIndex = random.nextInt(availableTexts.size());
 
-                // Отримуємо ресурс зображення з фіксованого масиву
-                int[] imageResources = {
-                        R.drawable.image1,
-                        R.drawable.image2,
-                        R.drawable.image3,
-                        R.drawable.image4,
-                        R.drawable.image5
-                };
-                int imageResId = imageResources[imageIndex];
+                // Отримуємо інформацію про доступні зображення
+                List<Integer> defaultImageResourceIds = new ArrayList<>();
+                List<Uri> customImageUris = new ArrayList<>();
+                loadAvailableImages(context, defaultImageResourceIds, customImageUris);
+
+                // Перевіряємо, чи є доступні зображення
+                int imageResId;
+                Uri imageUri = null;
+
+                if (!defaultImageResourceIds.isEmpty() || !customImageUris.isEmpty()) {
+                    // Вибираємо випадково між стандартними та користувацькими зображеннями
+                    boolean useDefault = defaultImageResourceIds.isEmpty() ? false :
+                            (customImageUris.isEmpty() ? true : random.nextBoolean());
+
+                    if (useDefault && !defaultImageResourceIds.isEmpty()) {
+                        // Використовуємо стандартне зображення
+                        int imageIndex = random.nextInt(defaultImageResourceIds.size());
+                        imageResId = defaultImageResourceIds.get(imageIndex);
+                    } else if (!customImageUris.isEmpty()) {
+                        // Використовуємо користувацьке зображення
+                        int imageIndex = random.nextInt(customImageUris.size());
+                        imageUri = customImageUris.get(imageIndex);
+                        imageResId = 0; // Не використовується для Uri
+                    } else {
+                        // Запасний варіант, якщо щось пішло не так
+                        imageResId = R.drawable.image1;
+                    }
+                } else {
+                    // Використовуємо запасне зображення якщо немає доступних
+                    imageResId = R.drawable.image1;
+                }
 
                 // Використовуємо власний текст, якщо він є
-                String displayText = customText.isEmpty() ? texts[textIndex] : customText;
+                String displayText = customText.isEmpty() ? availableTexts.get(textIndex) : customText;
 
                 // Оновлюємо вміст віджета
-                updateAppWidget(context, appWidgetManager, appWidgetId, imageResId, displayText);
+                updateAppWidget(context, appWidgetManager, appWidgetId, imageResId, imageUri, displayText);
             }
 
             // Встановлюємо будильник для наступного оновлення
@@ -101,27 +132,141 @@ public class MyWidgetProvider extends AppWidgetProvider {
         alarmManager.cancel(getPendingIntent(context));
     }
 
+    // Завантаження усіх доступних текстів з SharedPreferences
+    private List<String> loadAvailableTexts(Context context) {
+        List<String> texts = new ArrayList<>();
+
+        // Спочатку спробуємо завантажити з спільного SharedPreferences
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> savedTexts = prefs.getStringSet(PREF_ALL_TEXTS, new HashSet<>());
+
+        if (!savedTexts.isEmpty()) {
+            texts.addAll(savedTexts);
+        } else {
+            // Якщо немає текстів у SharedPreferences, завантажимо з ресурсів
+            try {
+                String[] defaultTexts = context.getResources().getStringArray(R.array.widget_quotes);
+                if (defaultTexts.length > 0) {
+                    for (String text : defaultTexts) {
+                        texts.add(text);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Помилка при отриманні текстів з ресурсів", e);
+            }
+        }
+
+        return texts;
+    }
+
+    // Завантаження усіх доступних зображень (і стандартних, і користувацьких)
+    private void loadAvailableImages(Context context, List<Integer> defaultImagesList, List<Uri> customImagesList) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> enabledImages = prefs.getStringSet(PREF_ENABLED_IMAGES, new HashSet<>());
+        Set<String> customImages = prefs.getStringSet(PREF_CUSTOM_IMAGES, new HashSet<>());
+
+        // Спочатку перевіряємо стандартні зображення
+        int[] defaultResIds = {
+                R.drawable.image1,
+                R.drawable.image2,
+                R.drawable.image3,
+                R.drawable.image4,
+                R.drawable.image5
+        };
+
+        for (int i = 0; i < defaultResIds.length; i++) {
+            String imageId = "default_" + i;
+            if (enabledImages.isEmpty() || enabledImages.contains(imageId)) {
+                defaultImagesList.add(defaultResIds[i]);
+            }
+        }
+
+        // Потім завантажуємо користувацькі зображення
+        for (String imageData : customImages) {
+            try {
+                String[] parts = imageData.split("\\|");
+                if (parts.length >= 3) {
+                    String imageId = parts[0];
+                    String imageUriStr = parts[1];
+
+                    if (enabledImages.isEmpty() || enabledImages.contains(imageId)) {
+                        Uri imageUri = Uri.parse(imageUriStr);
+                        customImagesList.add(imageUri);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Помилка при обробці користувацького зображення", e);
+            }
+        }
+    }
+
+    // Метод для оновлення вмісту віджета
     // Метод для оновлення вмісту віджета
     private void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                 int appWidgetId, int imageResId, String text) {
+                                 int appWidgetId, int imageResId, Uri imageUri, String text) {
         try {
             // Створюємо RemoteViews об'єкт
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 
-            // Оновлюємо зображення та текст
-            views.setImageViewResource(R.id.widget_image, imageResId);
+            // Оновлюємо зображення в залежності від типу
+            boolean imageSet = false;
+
+            // Спочатку спробуємо використовувати URI, якщо він є
+            if (imageUri != null) {
+                try {
+                    // Перевіряємо, чи є URI дійсним
+                    boolean isUriValid = false;
+                    try (InputStream is = context.getContentResolver().openInputStream(imageUri)) {
+                        isUriValid = (is != null);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Недійсний URI у віджеті: " + imageUri, e);
+                    }
+
+                    if (isUriValid) {
+                        views.setImageViewUri(R.id.widget_image, imageUri);
+                        imageSet = true;
+                        Log.d(TAG, "Встановлено URI зображення для віджета: " + imageUri);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Помилка при встановленні URI для віджета", e);
+                }
+            }
+
+            // Якщо URI не встановлено або виникла помилка, використовуємо ресурс
+            if (!imageSet && imageResId > 0) {
+                try {
+                    views.setImageViewResource(R.id.widget_image, imageResId);
+                    imageSet = true;
+                    Log.d(TAG, "Встановлено ресурс зображення для віджета: " + imageResId);
+                } catch (Exception e) {
+                    Log.e(TAG, "Помилка при встановленні ресурсу зображення для віджета", e);
+                }
+            }
+
+            // Якщо не вдалося встановити ні URI, ні ресурс, використовуємо запасне зображення
+            if (!imageSet) {
+                views.setImageViewResource(R.id.widget_image, R.drawable.image1);
+                Log.d(TAG, "Використовуємо запасне зображення для віджета");
+            }
+
+            // Оновлюємо текст
             views.setTextViewText(R.id.widget_text, text);
 
             // Встановлюємо онклік на весь віджет для ручного оновлення
             Intent intent = new Intent(context, MyWidgetProvider.class);
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[] { appWidgetId });
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    appWidgetId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
             views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 
             // Оновлюємо віджет
             appWidgetManager.updateAppWidget(appWidgetId, views);
+            Log.d(TAG, "Віджет " + appWidgetId + " успішно оновлено");
 
         } catch (Exception e) {
             Log.e(TAG, "Помилка при оновленні віджета " + appWidgetId, e);
@@ -203,7 +348,11 @@ public class MyWidgetProvider extends AppWidgetProvider {
     private PendingIntent getPendingIntent(Context context) {
         Intent intent = new Intent(context, MyWidgetProvider.class);
         intent.setAction(ACTION_UPDATE_WIDGET);
-        return PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
     }
 }

@@ -1,4 +1,3 @@
-// Виправлений код для WidgetConfigureActivity.java
 package com.example.lab6android;
 
 import android.app.Activity;
